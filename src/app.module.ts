@@ -4,12 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import databaseConfig from './config/database.config';
+import s3Config from './config/s3.config';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig],
+      load: [databaseConfig, s3Config],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -27,6 +29,7 @@ import databaseConfig from './config/database.config';
     }),
     AuthModule,
     UsersModule,
+    UploadModule,
   ],
 })
 export class AppModule {}

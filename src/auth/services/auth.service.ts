@@ -88,23 +88,37 @@ export class AuthService {
   }
 
   // If user want to refresh or login frequently then token need to refresh
-  async refreshTokens(userId: string, refreshToken: string) {
-    const user = await this.userService.findOne(userId);
+  async refreshTokens(refreshToken: string) {
+    try {
+      // verify the refresh token here
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get('jwt.secret'),
+      });
 
-    if (!user || !user.refreshToken) {
-      throw new ForbiddenException('Access denied');
+      const userId = payload.sub;
+
+      // find user with this Id
+      const user = await this.userService.findOne(userId);
+
+      if (!user || !user.refreshToken) {
+        throw new ForbiddenException('Access Denied');
+      }
+
+      // verify that the provided refresh token matches the stored hash
+      const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
+
+      if (!refreshTokenMatches) {
+        throw new ForbiddenException('Access denied');
+      }
+
+      // Generate new Token here
+      const tokens = await this.getTokens(user.id, user.email);
+      await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+      return tokens;
+    } catch (error) {
+      throw new ForbiddenException('Invalid refresh token');
     }
-
-    // compare user sent token with user Object found
-    const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
-
-    if (!refreshTokenMatches) {
-      throw new ForbiddenException('Access denied');
-    }
-
-    const tokens = await this.getTokens(user.id, user.email);
-    // update new refresh token in user Object
-    await this.updateRefreshToken(user.id, tokens.refreshToken);
   }
 
   async logout(userId: string) {

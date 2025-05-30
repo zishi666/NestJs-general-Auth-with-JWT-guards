@@ -67,8 +67,13 @@ export class UsersService {
 
   // Setting new refresh Token for User
   async setRefreshToken(userId: string, refreshToken: string | null): Promise<void> {
-    const user = await this.usersRepository.update(userId, { refreshToken });
-    console.log(userId);
-    console.log(user);
+    await this.usersRepository.update(userId, { refreshToken });
+  }
+
+  // Method for uploading profile photo
+  async updateProfilePhoto(userId: string, photoUrl: string): Promise<User> {
+    const user = await this.findOne(userId);
+    user.profilePhoto = photoUrl;
+    return this.usersRepository.save(user);
   }
 }

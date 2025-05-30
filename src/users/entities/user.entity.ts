@@ -27,6 +27,9 @@ export class User {
   @Exclude({ toPlainOnly: true })
   refreshToken: string;
 
+  @Column({ nullable: true })
+  profilePhoto: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

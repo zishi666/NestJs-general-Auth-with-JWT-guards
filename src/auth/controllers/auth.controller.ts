@@ -20,8 +20,8 @@ export class AuthController {
   }
 
   @Post('refresh')
-  refreshTokens(@GetUser('id') userId: string, @GetUser('refreshToken') refreshToken: string) {
-    return this.authService.refreshTokens(userId, refreshToken);
+  refreshTokens(@Body() body: { refreshToken: string }) {
+    return this.authService.refreshTokens(body.refreshToken);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -16,4 +16,8 @@ export class UpdateUserDto {
   @MinLength(2)
   @MaxLength(50)
   lastName?: string;
+
+  @IsString()
+  @IsOptional()
+  profilePhoto?: string;
 }
